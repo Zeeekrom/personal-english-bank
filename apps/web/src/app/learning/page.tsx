@@ -1,34 +1,72 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { API_URL, api } from "../../lib/api";
 
 interface LearningItem {
   id: string;
   title: string;
+  refinedEnglish?: string;
+  refinedChinese?: string;
   chineseIntention?: string;
+  mainIssue?: string;
   originalText?: string;
   usageMode: string;
   learningStatus: string;
   lastUsedAt?: string;
   variants: Array<{ id: string; variantType: string; content: string }>;
-  sources: Array<{ source: { id: string; title: string } }>;
+  sources: Array<{
+    source: { id: string; title: string; capturedAt?: string };
+  }>;
   _count: { usageEvents: number; reviewEvents: number };
 }
 
 export default function LearningPage() {
   const [items, setItems] = useState<LearningItem[]>([]);
+  const [query, setQuery] = useState("");
+  const [editingId, setEditingId] = useState<string>();
   const [loggingId, setLoggingId] = useState<string>();
   const [message, setMessage] = useState("");
 
-  const load = () => api<LearningItem[]>("/learning-items").then(setItems);
+  const load = useCallback(
+    () =>
+      api<LearningItem[]>(
+        `/learning-items${query ? `?q=${encodeURIComponent(query)}` : ""}`,
+      ).then(setItems),
+    [query],
+  );
   useEffect(() => {
     load().catch((error: Error) => setMessage(error.message));
-  }, []);
+  }, [load]);
+
+  async function updateItem(event: FormEvent<HTMLFormElement>, itemId: string) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    await api(`/learning-items/${itemId}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        title: form.get("title"),
+        refinedEnglish: form.get("refinedEnglish"),
+        refinedChinese: form.get("refinedChinese"),
+        chineseIntention: form.get("chineseIntention") || null,
+        mainIssue: form.get("mainIssue") || null,
+      }),
+    });
+    setEditingId(undefined);
+    setMessage("Sentence updated.");
+    await load();
+  }
+
+  async function deleteItem(itemId: string) {
+    if (!window.confirm("Delete this sentence and its review history?")) return;
+    await api(`/learning-items/${itemId}`, { method: "DELETE" });
+    setMessage("Sentence deleted.");
+    await load();
+  }
 
   async function submitUsage(
     event: FormEvent<HTMLFormElement>,
-    itemId: string
+    itemId: string,
   ) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -37,8 +75,8 @@ export default function LearningPage() {
       body: JSON.stringify({
         scenario: form.get("scenario") || undefined,
         outcome: form.get("outcome"),
-        notes: form.get("notes") || undefined
-      })
+        notes: form.get("notes") || undefined,
+      }),
     });
     setMessage("Real-world usage recorded.");
     setLoggingId(undefined);
@@ -49,55 +87,143 @@ export default function LearningPage() {
     <>
       <section className="page-heading">
         <div>
-          <p className="eyebrow">Active language</p>
+          <p className="eyebrow">Sentence database</p>
           <h1>Learning bank</h1>
-          <p>{items.length} reviewed expressions with source evidence.</p>
+          <p>
+            {items.length} curated bilingual sentences with source evidence.
+          </p>
         </div>
-        <a
-          className="primary-button"
-          href={`${API_URL}/api/exports/markdown`}
-        >
+        <div className="search-box">
+          <label htmlFor="learning-search">Search English or Chinese</label>
+          <input
+            id="learning-search"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="e.g. follow up"
+            value={query}
+          />
+        </div>
+        <a className="primary-button" href={`${API_URL}/api/exports/markdown`}>
           Export Markdown
         </a>
       </section>
       {message ? <p className="notice">{message}</p> : null}
       <section className="learning-list">
         {items.map((item) => {
-          const easy = item.variants.find(
-            (variant) => variant.variantType === "easy_active"
-          );
+          const english =
+            item.refinedEnglish ??
+            item.variants.find(
+              (variant) => variant.variantType === "easy_active",
+            )?.content ??
+            item.title;
           return (
             <article className="learning-card" key={item.id}>
               <div className="card-topline">
                 <span className={`status status-${item.learningStatus}`}>
                   {item.learningStatus}
                 </span>
-                <span>{item.usageMode.replace("_", " ")}</span>
+                <span>
+                  {item.sources[0]?.source.capturedAt
+                    ? new Date(
+                        item.sources[0].source.capturedAt,
+                      ).toLocaleDateString()
+                    : "Date unknown"}
+                </span>
               </div>
               <p className="eyebrow">{item.sources[0]?.source.title}</p>
-              <h2>{easy?.content ?? item.title}</h2>
-              {item.chineseIntention ? (
-                <p className="translation">{item.chineseIntention}</p>
+              <h2>{english}</h2>
+              <p className="translation">
+                {item.refinedChinese ?? item.chineseIntention}
+              </p>
+              {item.mainIssue ? (
+                <details>
+                  <summary>Main issue and raw evidence</summary>
+                  <p>{item.mainIssue}</p>
+                  <blockquote>{item.originalText}</blockquote>
+                </details>
               ) : null}
-              <details>
-                <summary>Original context</summary>
-                <blockquote>{item.originalText}</blockquote>
-              </details>
               <footer>
                 <span>{item._count.reviewEvents} reviews</span>
                 <span>{item._count.usageEvents} real uses</span>
                 <button
                   className="text-button"
                   onClick={() =>
-                    setLoggingId((current) =>
-                      current === item.id ? undefined : item.id
+                    setEditingId((current) =>
+                      current === item.id ? undefined : item.id,
                     )
                   }
                   type="button"
                 >
-                  Log real use
+                  Edit
+                </button>
+                <button
+                  className="text-button"
+                  onClick={() =>
+                    setLoggingId((current) =>
+                      current === item.id ? undefined : item.id,
+                    )
+                  }
+                  type="button"
+                >
+                  Log use
+                </button>
+                <button
+                  className="text-button"
+                  onClick={() => void deleteItem(item.id)}
+                  type="button"
+                >
+                  Delete
                 </button>
               </footer>
+              {editingId === item.id ? (
+                <form
+                  className="usage-form"
+                  onSubmit={(event) => void updateItem(event, item.id)}
+                >
+                  <label>
+                    Title
+                    <input defaultValue={item.title} name="title" required />
+                  </label>
+                  <label>
+                    Refined English
+                    <textarea
+                      defaultValue={english}
+                      name="refinedEnglish"
+                      required
+                      rows={3}
+                    />
+                  </label>
+                  <label>
+                    Refined Chinese
+                    <textarea
+                      defaultValue={
+                        item.refinedChinese ?? item.chineseIntention
+                      }
+                      name="refinedChinese"
+                      required
+                      rows={3}
+                    />
+                  </label>
+                  <label>
+                    Intended meaning in Chinese
+                    <textarea
+                      defaultValue={item.chineseIntention}
+                      name="chineseIntention"
+                      rows={2}
+                    />
+                  </label>
+                  <label>
+                    Main issue
+                    <textarea
+                      defaultValue={item.mainIssue}
+                      name="mainIssue"
+                      rows={2}
+                    />
+                  </label>
+                  <button className="primary-button" type="submit">
+                    Save sentence
+                  </button>
+                </form>
+              ) : null}
               {loggingId === item.id ? (
                 <form
                   className="usage-form"
@@ -130,8 +256,8 @@ export default function LearningPage() {
         })}
         {items.length === 0 ? (
           <div className="empty-state">
-            <h2>No learning items yet</h2>
-            <p>Open a source, select one useful segment, and rewrite it.</p>
+            <h2>No curated sentences found</h2>
+            <p>Ask Codex to process a source and import its curated package.</p>
           </div>
         ) : null}
       </section>

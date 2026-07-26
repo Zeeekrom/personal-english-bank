@@ -11,7 +11,7 @@ export class ExportController {
   @Header("Content-Type", "text/markdown; charset=utf-8")
   @Header(
     "Content-Disposition",
-    'attachment; filename="personal-english-bank.md"'
+    'attachment; filename="personal-english-bank.md"',
   )
   async exportMarkdown(): Promise<string> {
     const items = await prisma.learningItem.findMany({
@@ -20,21 +20,23 @@ export class ExportController {
         variants: { orderBy: { sortOrder: "asc" } },
         sources: {
           include: {
-            source: { select: { title: true } },
-            segment: { select: { startMs: true } }
-          }
+            source: {
+              select: { title: true, capturedAt: true, summaryCn: true },
+            },
+            segment: { select: { startMs: true } },
+          },
         },
         reviewSchedule: true,
-        _count: { select: { reviewEvents: true, usageEvents: true } }
+        _count: { select: { reviewEvents: true, usageEvents: true } },
       },
-      orderBy: [{ priority: "desc" }, { createdAt: "desc" }]
+      orderBy: [{ priority: "desc" }, { createdAt: "desc" }],
     });
 
     const sections = items.map((item) => {
       const variants = item.variants
         .map(
           (variant) =>
-            `- **${variant.variantType.replaceAll("_", " ")}:** ${variant.content}`
+            `- **${variant.variantType.replaceAll("_", " ")}:** ${variant.content}`,
         )
         .join("\n");
       const source = item.sources[0];
@@ -42,15 +44,20 @@ export class ExportController {
         `## ${item.title}`,
         "",
         `- **Status:** ${item.learningStatus}`,
-        `- **Usage mode:** ${item.usageMode}`,
+        `- **Refined English:** ${clean(item.refinedEnglish)}`,
+        `- **Refined Chinese:** ${clean(item.refinedChinese)}`,
         `- **Chinese intention:** ${clean(item.chineseIntention)}`,
-        `- **Original:** ${clean(item.originalText)}`,
+        `- **Main issue:** ${clean(item.mainIssue)}`,
+        `- **Raw English evidence:** ${clean(item.originalText)}`,
+        `- **Raw Chinese evidence:** ${clean(item.sourceTranslation)}`,
         variants,
         `- **Source:** ${clean(source?.source.title)}`,
+        `- **Source date:** ${source?.source.capturedAt?.toISOString() ?? "—"}`,
+        `- **Source summary:** ${clean(source?.source.summaryCn)}`,
         `- **Reviews:** ${item._count.reviewEvents}`,
         `- **Real uses:** ${item._count.usageEvents}`,
         `- **Next review:** ${item.reviewSchedule?.nextReviewAt.toISOString() ?? "—"}`,
-        ""
+        "",
       ].join("\n");
     });
 
@@ -60,7 +67,7 @@ export class ExportController {
       `> Exported at ${new Date().toISOString()}`,
       "> Generated from the local SQL Server source of truth.",
       "",
-      ...sections
+      ...sections,
     ].join("\n");
   }
 }

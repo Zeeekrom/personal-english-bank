@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from "@nestjs/common";
+import type { UpdateSourceInput } from "@peb/domain";
 import { SourcesService } from "./sources.service.js";
 
 @Controller("sources")
@@ -15,6 +25,16 @@ export class SourcesController {
     return this.sourcesService.get(id);
   }
 
+  @Patch(":id")
+  update(@Param("id") id: string, @Body() body: UpdateSourceInput) {
+    return this.sourcesService.update(id, body);
+  }
+
+  @Delete(":id")
+  remove(@Param("id") id: string) {
+    return this.sourcesService.remove(id);
+  }
+
   @Patch("segments/:segmentId/speaker")
   assignSpeaker(
     @Param("segmentId") segmentId: string,
@@ -24,7 +44,7 @@ export class SourcesController {
       role?: string;
       isMe?: boolean;
       applyToDiarizationKey?: boolean;
-    }
+    },
   ) {
     return this.sourcesService.assignSpeaker(segmentId, body);
   }
@@ -44,7 +64,7 @@ export class SourcesController {
       betterVersion?: string;
       followUp?: string;
       reflection?: string;
-    }
+    },
   ) {
     return this.sourcesService.createInteraction(id, body);
   }

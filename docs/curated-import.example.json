@@ -1,0 +1,31 @@
+{
+  "contractVersion": "1.0",
+  "source": {
+    "title": "Example bank appointment",
+    "inputType": "audio",
+    "originalFileName": "example-bank-appointment.mp3",
+    "relativePath": "processed/example-bank-appointment.curated.json",
+    "capturedAt": "2026-07-26T02:00:00.000Z",
+    "scenario": "bank",
+    "summaryCn": "询问银行卡邮寄时间并确认地址。",
+    "language": "en-zh"
+  },
+  "evidence": {
+    "rawBilingualText": "Where my card arrive?\n我的卡什么时候到？",
+    "refinedBilingualText": "Could you tell me when my card will arrive?\n请问我的银行卡什么时候能寄到？",
+    "transcriptionTool": "local-whisper",
+    "uncertaintyNotes": "The original audio was unclear before the word card."
+  },
+  "sentences": [
+    {
+      "rawEnglish": "Where my card arrive?",
+      "rawChinese": "我的卡什么时候到？",
+      "english": "Could you tell me when my card will arrive?",
+      "chinese": "请问我的银行卡什么时候能寄到？",
+      "mainIssue": "The raw sentence is incomplete and may contain a transcription error.",
+      "intentionCn": "礼貌询问银行卡预计寄达时间。",
+      "explanationCn": "Could you tell me... 是适合柜台咨询的简单礼貌问法。",
+      "priority": 10
+    }
+  ]
+}

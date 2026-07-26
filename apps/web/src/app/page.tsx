@@ -6,7 +6,7 @@ import { api } from "../lib/api";
 
 interface Dashboard {
   sources: number;
-  unprocessedSources: number;
+  curatedSources: number;
   learningItems: number;
   dueReviews: number;
   usageEvents: number;
@@ -20,24 +20,22 @@ export default function DashboardPage() {
   useEffect(() => {
     api<Dashboard>("/dashboard")
       .then(setDashboard)
-      .catch((reason: Error) => {
-        setError(reason.message);
-      });
+      .catch((reason: Error) => setError(reason.message));
   }, []);
 
   return (
     <>
       <section className="hero">
         <div>
-          <p className="eyebrow">MVP v0.1 · Today</p>
-          <h1>Learn less. Use more.</h1>
+          <p className="eyebrow">Local curated corpus · Today</p>
+          <h1>Refine first. Review what matters.</h1>
           <p className="lede">
-            Turn one real transcript fragment into one sentence you can actually
-            say next time.
+            Codex prepares each source; the database stores only clean,
+            traceable bilingual sentences.
           </p>
         </div>
         <Link className="primary-button" href="/sources">
-          Process a source
+          Open curated sources
         </Link>
       </section>
 
@@ -64,12 +62,12 @@ export default function DashboardPage() {
               ? `Review ${Math.min(
                   dashboard.dueReviews,
                   dashboard.dailyReviewLimit,
-                )} due expressions`
-              : "Create one active expression"}
+                )} due sentences`
+              : "Ask Codex to curate the next source"}
           </h2>
           <p>
-            The queue is intentionally capped at{" "}
-            {dashboard?.dailyReviewLimit ?? 10} items per day.
+            The queue is capped at {dashboard?.dailyReviewLimit ?? 10} items per
+            day.
           </p>
           <Link
             className="text-link"
@@ -80,11 +78,11 @@ export default function DashboardPage() {
         </article>
 
         <article className="panel">
-          <p className="eyebrow">Source inbox</p>
-          <h2>{dashboard?.unprocessedSources ?? "—"} need review</h2>
+          <p className="eyebrow">Curated database</p>
+          <h2>{dashboard?.curatedSources ?? "—"} sources ready</h2>
           <p>
-            Imported transcripts stay as evidence. Nothing becomes a learning
-            item until you select and rewrite it.
+            Raw media and text stay outside the learning database until Codex
+            has produced both evidence and refined bilingual versions.
           </p>
         </article>
       </section>

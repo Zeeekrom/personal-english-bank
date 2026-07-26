@@ -1,13 +1,13 @@
 import {
   BadRequestException,
   Injectable,
-  NotFoundException
+  NotFoundException,
 } from "@nestjs/common";
 import { prisma } from "@peb/database";
 import {
   applyReviewRating,
   reviewSubmissionSchema,
-  type ReviewSubmission
+  type ReviewSubmission,
 } from "@peb/domain";
 
 @Injectable()
@@ -15,13 +15,13 @@ export class ReviewsService {
   due() {
     const limit = Math.max(
       1,
-      Math.min(50, Number(process.env.DAILY_REVIEW_LIMIT ?? 10))
+      Math.min(50, Number(process.env.DAILY_REVIEW_LIMIT ?? 10)),
     );
     return prisma.reviewSchedule.findMany({
       where: {
         suspended: false,
         nextReviewAt: { lte: new Date() },
-        learningItem: { learningStatus: { not: "archived" } }
+        learningItem: { learningStatus: { not: "archived" } },
       },
       include: {
         learningItem: {
@@ -29,37 +29,70 @@ export class ReviewsService {
             variants: { orderBy: { sortOrder: "asc" } },
             sources: {
               include: {
-                source: { select: { id: true, title: true } },
+                source: {
+                  select: {
+                    id: true,
+                    title: true,
+                    capturedAt: true,
+                    summaryCn: true,
+                  },
+                },
                 segment: {
                   select: {
                     id: true,
                     text: true,
                     translationText: true,
-                    startMs: true
-                  }
-                }
-              }
-            }
-          }
-        }
+                    startMs: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
-      orderBy: [{ nextReviewAt: "asc" }, { learningItem: { priority: "desc" } }],
-      take: limit
+      orderBy: [
+        { nextReviewAt: "asc" },
+        { learningItem: { priority: "desc" } },
+      ],
+      take: limit,
     });
   }
 
   async submit(learningItemId: string, input: ReviewSubmission) {
+    return this.submitWithMode(learningItemId, input, "rated");
+  }
+
+  complete(
+    learningItemId: string,
+    input: { responseText?: string; notes?: string },
+  ) {
+    return this.submitWithMode(
+      learningItemId,
+      {
+        rating: "good",
+        responseText: input.responseText,
+        notes: input.notes,
+      },
+      input.responseText ? "voice_transcript" : "manual_complete",
+    );
+  }
+
+  private async submitWithMode(
+    learningItemId: string,
+    input: ReviewSubmission,
+    completionMode: string,
+  ) {
     const parsed = reviewSubmissionSchema.safeParse(input);
     if (!parsed.success) {
       throw new BadRequestException({
         message: "Invalid review submission.",
-        issues: parsed.error.issues
+        issues: parsed.error.issues,
       });
     }
     const data = parsed.data;
     const schedule = await prisma.reviewSchedule.findUnique({
       where: { learningItemId },
-      include: { learningItem: true }
+      include: { learningItem: true },
     });
     if (!schedule) throw new NotFoundException("Review schedule not found.");
 
@@ -67,24 +100,24 @@ export class ReviewsService {
       {
         repetitions: schedule.repetitions,
         intervalDays: schedule.intervalDays,
-        learningStatus: schedule.learningItem.learningStatus
+        learningStatus: schedule.learningItem.learningStatus,
       },
-      data.rating
+      data.rating,
     );
 
     return prisma.$transaction(async (tx) => {
       const previousStatus = schedule.learningItem.learningStatus;
       await tx.learningItem.update({
         where: { id: learningItemId },
-        data: { learningStatus: result.learningStatus }
+        data: { learningStatus: result.learningStatus },
       });
       await tx.reviewSchedule.update({
         where: { learningItemId },
         data: {
           repetitions: result.repetitions,
           intervalDays: result.intervalDays,
-          nextReviewAt: result.nextReviewAt
-        }
+          nextReviewAt: result.nextReviewAt,
+        },
       });
       return tx.reviewEvent.create({
         data: {
@@ -95,8 +128,9 @@ export class ReviewsService {
           previousStatus,
           newStatus: result.learningStatus,
           nextReviewAt: result.nextReviewAt,
-          intervalDays: result.intervalDays
-        }
+          intervalDays: result.intervalDays,
+          completionMode,
+        },
       });
     });
   }

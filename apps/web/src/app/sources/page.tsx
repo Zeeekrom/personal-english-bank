@@ -15,6 +15,8 @@ interface Source {
   title: string;
   sourceType: string;
   language: string;
+  summaryCn?: string;
+  capturedAt?: string;
   processingStatus: string;
   importedAt: string;
   assets: Array<{ relativePath: string; byteSize: number }>;
@@ -31,8 +33,10 @@ export default function SourcesPage() {
 
   const load = useCallback(async () => {
     const [sourceData, fileData] = await Promise.all([
-      api<Source[]>(`/sources${query ? `?q=${encodeURIComponent(query)}` : ""}`),
-      api<DiscoveredFile[]>("/imports/discover")
+      api<Source[]>(
+        `/sources${query ? `?q=${encodeURIComponent(query)}` : ""}`,
+      ),
+      api<DiscoveredFile[]>("/imports/discover"),
     ]);
     setSources(sourceData);
     setDiscovered(fileData);
@@ -43,11 +47,16 @@ export default function SourcesPage() {
   }, [load]);
 
   const importedPaths = useMemo(
-    () => new Set(sources.flatMap((source) => source.assets.map((asset) => asset.relativePath))),
-    [sources]
+    () =>
+      new Set(
+        sources.flatMap((source) =>
+          source.assets.map((asset) => asset.relativePath),
+        ),
+      ),
+    [sources],
   );
   const available = discovered.filter(
-    (file) => !importedPaths.has(file.relativePath)
+    (file) => !importedPaths.has(file.relativePath),
   );
 
   async function importSelected() {
@@ -58,14 +67,14 @@ export default function SourcesPage() {
         Array<{ status: string; relativePath: string; segments?: number }>
       >("/imports", {
         method: "POST",
-        body: JSON.stringify({ relativePaths: selected })
+        body: JSON.stringify({ relativePaths: selected }),
       });
       const imported = result.filter((item) => item.status === "imported");
       setMessage(
-        `Imported ${imported.length} source${imported.length === 1 ? "" : "s"} with ${imported.reduce(
+        `Imported ${imported.length} curated source${imported.length === 1 ? "" : "s"} and ${imported.reduce(
           (total, item) => total + (item.segments ?? 0),
-          0
-        )} segments.`
+          0,
+        )} review sentences.`,
       );
       setSelected([]);
       await load();
@@ -80,16 +89,20 @@ export default function SourcesPage() {
     <>
       <section className="page-heading">
         <div>
-          <p className="eyebrow">Inbox</p>
+          <p className="eyebrow">Curated corpus</p>
           <h1>Sources</h1>
-          <p>Import read-only transcript files and process them in context.</p>
+          <p>
+            Only Codex-curated bilingual packages enter the learning database.
+          </p>
         </div>
         <div className="search-box">
-          <label htmlFor="source-search">Search sources or transcript text</label>
+          <label htmlFor="source-search">
+            Search file, summary, English or Chinese
+          </label>
           <input
             id="source-search"
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="e.g. consultation"
+            placeholder="e.g. bank appointment"
             value={query}
           />
         </div>
@@ -97,31 +110,42 @@ export default function SourcesPage() {
 
       <section className="panel import-panel">
         <div>
-          <p className="eyebrow">Translation folder</p>
-          <h2>Choose files to import</h2>
-          <p>{available.length} supported files have not been imported.</p>
+          <p className="eyebrow">Ready for database import</p>
+          <h2>Curated import packages</h2>
+          <p>
+            Audio/video and raw text must first be transcribed, translated and
+            refined by Codex. This inbox accepts only{" "}
+            <code>*.curated.json</code>.
+          </p>
         </div>
         <div className="import-list">
           {available.slice(0, 20).map((file) => (
             <label className="check-row" key={file.relativePath}>
               <input
                 checked={selected.includes(file.relativePath)}
-                disabled={!selected.includes(file.relativePath) && selected.length >= 5}
+                disabled={
+                  !selected.includes(file.relativePath) && selected.length >= 5
+                }
                 onChange={(event) =>
                   setSelected((current) =>
                     event.target.checked
                       ? [...current, file.relativePath]
-                      : current.filter((item) => item !== file.relativePath)
+                      : current.filter((item) => item !== file.relativePath),
                   )
                 }
                 type="checkbox"
               />
               <span>
                 <strong>{file.relativePath}</strong>
-                <small>{Math.max(1, Math.round(file.byteSize / 1024))} KB</small>
+                <small>
+                  {Math.max(1, Math.round(file.byteSize / 1024))} KB
+                </small>
               </span>
             </label>
           ))}
+          {available.length === 0 ? (
+            <p className="notice">No new curated package is waiting.</p>
+          ) : null}
         </div>
         <button
           className="primary-button"
@@ -136,18 +160,26 @@ export default function SourcesPage() {
 
       <section className="source-grid">
         {sources.map((source) => (
-          <Link className="source-card" href={`/sources/${source.id}`} key={source.id}>
+          <Link
+            className="source-card"
+            href={`/sources/${source.id}`}
+            key={source.id}
+          >
             <div className="card-topline">
               <span className={`status status-${source.processingStatus}`}>
                 {source.processingStatus.replace("_", " ")}
               </span>
-              <span>{source.language}</span>
+              <span>
+                {source.capturedAt
+                  ? new Date(source.capturedAt).toLocaleDateString()
+                  : "Date unknown"}
+              </span>
             </div>
             <h2>{source.title}</h2>
-            <p>{source.assets[0]?.relativePath}</p>
+            <p>{source.summaryCn ?? "No summary"}</p>
             <footer>
               <span>{source.sourceType.replaceAll("_", " ")}</span>
-              <span>{source._count.learningLinks} learning items</span>
+              <span>{source._count.learningLinks} curated sentences</span>
             </footer>
           </Link>
         ))}

@@ -14,6 +14,21 @@ entry here before it is committed and pushed.
 
 - Updated GitHub Actions to Node 24-compatible major versions to remove runner
   deprecation warnings.
+- Replaced raw transcript import and user-side manual selection with a
+  Codex-curated bilingual import contract.
+- Changed daily review to a speak-once, ungraded completion flow while retaining
+  the fixed 1/3/7/14/30-day schedule.
+- Updated the product plan to v1.3 and clarified that Phase 1 AI/transcription
+  work happens outside the running application.
+
+### Added
+
+- Versioned `1.0` curated import API, JSON Schema and example package.
+- Raw and refined bilingual evidence, source summaries, sentence-level
+  curation fields and source/date traceability.
+- Search plus create/read/update/delete operations for sources and learning
+  items.
+- Cascade-safe source deletion and a curated-workflow smoke test.
 
 ## [0.1.0] - 2026-07-26
 

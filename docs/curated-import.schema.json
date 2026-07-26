@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Zeeekrom/personal-english-bank/blob/main/docs/curated-import.schema.json",
+  "title": "Personal English Bank Curated Import Package",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contractVersion", "source", "evidence", "sentences"],
+  "properties": {
+    "contractVersion": {
+      "const": "1.0"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "inputType", "originalFileName", "summaryCn"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "inputType": {
+          "enum": ["audio", "video", "pretranscribed_text"]
+        },
+        "originalFileName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "relativePath": { "type": "string", "maxLength": 1000 },
+        "capturedAt": { "type": "string", "format": "date-time" },
+        "scenario": { "type": "string", "maxLength": 100 },
+        "summaryCn": { "type": "string", "minLength": 1, "maxLength": 4000 },
+        "language": { "type": "string", "default": "en-zh", "maxLength": 30 }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rawBilingualText", "refinedBilingualText"],
+      "properties": {
+        "rawBilingualText": { "type": "string", "minLength": 1 },
+        "refinedBilingualText": { "type": "string", "minLength": 1 },
+        "transcriptionTool": { "type": "string", "maxLength": 100 },
+        "uncertaintyNotes": { "type": "string", "maxLength": 4000 }
+      }
+    },
+    "sentences": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["english", "chinese"],
+        "properties": {
+          "english": { "type": "string", "minLength": 1, "maxLength": 4000 },
+          "chinese": { "type": "string", "minLength": 1, "maxLength": 4000 },
+          "rawEnglish": { "type": "string", "maxLength": 4000 },
+          "rawChinese": { "type": "string", "maxLength": 4000 },
+          "startMs": { "type": "integer", "minimum": 0 },
+          "endMs": { "type": "integer", "minimum": 0 },
+          "speakerLabel": { "type": "string", "maxLength": 100 },
+          "mainIssue": { "type": "string", "maxLength": 4000 },
+          "intentionCn": { "type": "string", "maxLength": 4000 },
+          "explanationCn": { "type": "string", "maxLength": 4000 },
+          "curationNotes": { "type": "string", "maxLength": 4000 },
+          "priority": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "default": 0
+          }
+        }
+      }
+    }
+  }
+}

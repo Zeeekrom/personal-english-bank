@@ -14,4 +14,9 @@ export class ImportController {
   importFiles(@Body() body: { relativePaths?: string[] }) {
     return this.importService.importRelativePaths(body.relativePaths ?? []);
   }
+
+  @Post("curated")
+  importCurated(@Body() body: unknown) {
+    return this.importService.importCurated(body);
+  }
 }

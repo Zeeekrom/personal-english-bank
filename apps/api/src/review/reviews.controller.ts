@@ -18,4 +18,12 @@ export class ReviewsController {
   ) {
     return this.reviewsService.submit(learningItemId, body);
   }
+
+  @Post(":learningItemId/complete")
+  complete(
+    @Param("learningItemId") learningItemId: string,
+    @Body() body: { responseText?: string; notes?: string },
+  ) {
+    return this.reviewsService.complete(learningItemId, body);
+  }
 }

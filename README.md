@@ -2,33 +2,68 @@
 
 [![CI](https://github.com/Zeeekrom/personal-english-bank/actions/workflows/ci.yml/badge.svg)](https://github.com/Zeeekrom/personal-english-bank/actions/workflows/ci.yml)
 
-Personal English Bank turns real transcript fragments into simple English that
-can be reviewed and used in real conversations.
+Personal English Bank stores clean, traceable bilingual sentences from real
+conversations and schedules them for daily spaced review.
 
-The current implementation is MVP v0.1 / Phase 1. It deliberately excludes AI
-and Azure deployment so the learning loop can be validated first.
+The current implementation is a local Phase 1 MVP. The application does not
+call an AI model, speech service, cloud platform or remote server.
 
-## Implemented workflow
+## Phase 1 workflow
 
 ```text
-Translation folder
-→ read-only text import
-→ Source / Asset / Transcript / Segment
-→ manual speaker confirmation
-→ manual Learning Item
-→ 1 / 3 / 7 / 14 / 30 day review
-→ real-world usage log
-→ Markdown export
+MP3 / MP4 ──→ Codex uses a local transcription tool ┐
+                                                  ├─→ raw bilingual evidence
+Prepared text ─────────────────────────────────────┘
+        → Codex translation, cleanup, correction, summary and filtering
+        → refined bilingual version
+        → *.curated.json package
+        → Source + file/date/summary
+        → sentence-level Learning Items
+        → 1 / 3 / 7 / 14 / 30 day review
+        → speak once and click Complete (no speech grading)
 ```
 
-Supported imports in Phase 1:
+Codex is the temporary external curator in Phase 1. A future AI workflow will
+use the same validated import contract instead of writing directly to the
+database.
 
-- `.txt`
-- `.md`
-- text files without an extension
+## Curation rules
 
-DOCX is discovered in the source archive but will be added through a separate
-adapter after the text workflow is stable.
+- Preserve one English line followed by one Chinese line in both evidence and
+  refined versions.
+- Keep uncertain transcription or translation in the raw evidence.
+- Correct obvious transcription problems, restore complete meaning and remove
+  junk in the refined version without inventing facts.
+- Only selected `keep` sentences enter the learning database.
+- Every sentence must link back to its original file, captured date, source
+  summary and sentence position.
+
+The contract is defined in
+[`docs/curated-import.schema.json`](docs/curated-import.schema.json), with a
+safe example in
+[`docs/curated-import.example.json`](docs/curated-import.example.json).
+
+Curated packages can be imported from the configured `TRANSLATION_ROOT` as
+`*.curated.json`, or posted directly:
+
+```http
+POST /api/imports/curated
+Content-Type: application/json
+```
+
+Raw TXT, Markdown, MP3 and MP4 files are never imported directly into the
+learning database.
+
+## Product capabilities
+
+- Source search by file name, date, summary, English and Chinese
+- Source-level raw/refined bilingual evidence and Chinese summary
+- Sentence-level source traceability
+- Source and Learning Item create/read/update/delete APIs
+- Local SQL Server persistence through Prisma migrations
+- Fixed-interval daily review with an ungraded completion action
+- Real-world usage history and Markdown export
+- Versioned API contract for Codex and future AI providers
 
 ## Local development
 
@@ -38,8 +73,8 @@ Requirements:
 - pnpm 10+
 - Docker Desktop
 
-Copy `.env.example` to `.env` and set a local SQL Server password and the
-Translation folder path. Then run:
+Copy `.env.example` to `.env`, set the local SQL Server password and configure
+`TRANSLATION_ROOT`. Then run:
 
 ```powershell
 docker compose up -d
@@ -54,14 +89,11 @@ Open:
 - Web: `http://localhost:3000`
 - API: `http://localhost:3001/api/dashboard`
 
-To import the five representative transcript files:
+Import up to five waiting curated packages:
 
 ```powershell
 pnpm db:seed
 ```
-
-The import is idempotent. Re-running it reports each existing file as a
-duplicate based on SHA-256 content hashes.
 
 ## Verification
 
@@ -69,23 +101,18 @@ duplicate based on SHA-256 content hashes.
 pnpm test
 pnpm typecheck
 pnpm build
+pnpm smoke
 ```
 
-## Data rules
+## Data and publication rules
 
-- Files under the configured `TRANSLATION_ROOT` are read only.
-- Imported source text never becomes a learning item automatically.
-- Every learning item links back to its source and selected segment.
-- SQL Server stores structured JSON as validated `NVARCHAR(MAX)`, not Prisma
-  `Json`.
-- All times are stored in UTC. The configured user timezone is
-  `Australia/Hobart`.
-
-## Change log and publication
-
-Every material change must update `CHANGELOG.md`, pass the relevant validation,
-and be committed and pushed to the public GitHub repository. Local transcripts,
-database contents, `.env` files, screenshots and build output stay private.
+- Files under `TRANSLATION_ROOT` are read-only.
+- Raw media, transcript archives, `.env`, local database content, screenshots
+  and build output are never committed.
+- Every material change updates `CHANGELOG.md`, passes validation, and is
+  committed and pushed to the public GitHub repository.
+- SQL Server is the application source of truth; the original local files
+  remain evidence.
 
 ## License
 
