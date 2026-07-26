@@ -1,0 +1,226 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../packages/database/src/generated"
+}
+
+datasource db {
+  provider = "sqlserver"
+}
+
+model Source {
+  id                 String               @id @default(uuid()) @db.NVarChar(36)
+  title              String               @db.NVarChar(500)
+  sourceType         String               @default("unknown") @db.NVarChar(50)
+  language           String               @default("unknown") @db.NVarChar(30)
+  scenario           String?              @db.NVarChar(100)
+  containsMySpeech   Boolean              @default(false)
+  processingPriority Int                  @default(0)
+  processingStatus   String               @default("new") @db.NVarChar(30)
+  capturedAt         DateTime?            @db.DateTime2
+  importedAt         DateTime             @default(now()) @db.DateTime2
+  createdAt          DateTime             @default(now()) @db.DateTime2
+  updatedAt          DateTime             @updatedAt @db.DateTime2
+  assets             SourceAsset[]
+  transcripts        Transcript[]
+  learningLinks      LearningItemSource[]
+  usageEvents        UsageEvent[]
+  interactionLogs    InteractionLog[]
+
+  @@index([processingStatus, processingPriority, importedAt])
+}
+
+model SourceAsset {
+  id             String   @id @default(uuid()) @db.NVarChar(36)
+  sourceId       String   @db.NVarChar(36)
+  assetType      String   @default("transcript_text") @db.NVarChar(30)
+  originalName   String   @db.NVarChar(500)
+  relativePath   String   @db.NVarChar(1000)
+  externalPath   String   @db.NVarChar(2000)
+  contentHash    String   @unique @db.NVarChar(64)
+  mimeType       String?  @db.NVarChar(150)
+  byteSize       BigInt
+  metadataJson   String?  @db.NVarChar(Max)
+  createdAt      DateTime @default(now()) @db.DateTime2
+  source         Source   @relation(fields: [sourceId], references: [id], onDelete: NoAction)
+
+  @@index([sourceId])
+}
+
+model Transcript {
+  id            String              @id @default(uuid()) @db.NVarChar(36)
+  sourceId      String              @db.NVarChar(36)
+  provider      String              @default("import") @db.NVarChar(50)
+  format        String              @default("plain") @db.NVarChar(30)
+  language      String              @default("unknown") @db.NVarChar(30)
+  originalText  String              @db.NVarChar(Max)
+  cleanedText   String?             @db.NVarChar(Max)
+  version       Int                 @default(1)
+  isCurrent     Boolean             @default(true)
+  createdAt     DateTime            @default(now()) @db.DateTime2
+  source        Source              @relation(fields: [sourceId], references: [id], onDelete: NoAction)
+  segments      TranscriptSegment[]
+  speakerMaps   TranscriptSpeaker[]
+
+  @@index([sourceId, isCurrent])
+}
+
+model Speaker {
+  id           String              @id @default(uuid()) @db.NVarChar(36)
+  displayName  String              @db.NVarChar(200)
+  role         String              @default("unknown") @db.NVarChar(30)
+  isMe         Boolean             @default(false)
+  privacyLabel String?             @db.NVarChar(100)
+  createdAt    DateTime            @default(now()) @db.DateTime2
+  mappings     TranscriptSpeaker[]
+  segments     TranscriptSegment[]
+
+  @@index([isMe])
+}
+
+model TranscriptSpeaker {
+  id             String     @id @default(uuid()) @db.NVarChar(36)
+  transcriptId   String     @db.NVarChar(36)
+  diarizationKey String     @db.NVarChar(100)
+  speakerId      String?    @db.NVarChar(36)
+  displayLabel   String     @db.NVarChar(200)
+  manuallyMapped Boolean    @default(false)
+  transcript     Transcript @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
+  speaker        Speaker?   @relation(fields: [speakerId], references: [id], onDelete: NoAction)
+
+  @@unique([transcriptId, diarizationKey])
+  @@index([speakerId])
+}
+
+model TranscriptSegment {
+  id               String               @id @default(uuid()) @db.NVarChar(36)
+  transcriptId     String               @db.NVarChar(36)
+  speakerId        String?              @db.NVarChar(36)
+  diarizationKey   String?              @db.NVarChar(100)
+  segmentIndex     Int
+  startMs          Int?
+  endMs            Int?
+  text             String               @db.NVarChar(Max)
+  translationText  String?              @db.NVarChar(Max)
+  confidence       Float?
+  manuallyVerified Boolean              @default(false)
+  createdAt        DateTime             @default(now()) @db.DateTime2
+  transcript       Transcript           @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
+  speaker          Speaker?             @relation(fields: [speakerId], references: [id], onDelete: NoAction)
+  learningLinks    LearningItemSource[]
+
+  @@unique([transcriptId, segmentIndex])
+  @@index([speakerId])
+}
+
+model LearningItem {
+  id                 String               @id @default(uuid()) @db.NVarChar(36)
+  title              String               @db.NVarChar(500)
+  itemType           String               @default("my_better_version") @db.NVarChar(50)
+  chineseIntention   String?              @db.NVarChar(Max)
+  originalText       String?              @db.NVarChar(Max)
+  explanationCn      String?              @db.NVarChar(Max)
+  usageMode          String               @default("active_use") @db.NVarChar(30)
+  learningStatus     String               @default("ready") @db.NVarChar(30)
+  difficulty         Int                  @default(1)
+  priority           Int                  @default(0)
+  lastUsedAt         DateTime?            @db.DateTime2
+  createdAt          DateTime             @default(now()) @db.DateTime2
+  updatedAt          DateTime             @updatedAt @db.DateTime2
+  variants           LearningItemVariant[]
+  sources            LearningItemSource[]
+  reviewSchedule     ReviewSchedule?
+  reviewEvents       ReviewEvent[]
+  usageEvents        UsageEvent[]
+
+  @@index([learningStatus, priority, createdAt])
+}
+
+model LearningItemVariant {
+  id             String       @id @default(uuid()) @db.NVarChar(36)
+  learningItemId String       @db.NVarChar(36)
+  variantType    String       @db.NVarChar(30)
+  content        String       @db.NVarChar(Max)
+  register       String?      @db.NVarChar(30)
+  sortOrder      Int          @default(0)
+  createdAt      DateTime     @default(now()) @db.DateTime2
+  learningItem   LearningItem @relation(fields: [learningItemId], references: [id], onDelete: Cascade)
+
+  @@unique([learningItemId, variantType])
+}
+
+model LearningItemSource {
+  id             String            @id @default(uuid()) @db.NVarChar(36)
+  learningItemId String            @db.NVarChar(36)
+  sourceId       String            @db.NVarChar(36)
+  segmentId      String?           @db.NVarChar(36)
+  relationType   String            @default("derived_from") @db.NVarChar(30)
+  learningItem   LearningItem      @relation(fields: [learningItemId], references: [id], onDelete: Cascade)
+  source         Source            @relation(fields: [sourceId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  segment        TranscriptSegment? @relation(fields: [segmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([learningItemId, sourceId, segmentId])
+  @@index([segmentId])
+}
+
+model ReviewSchedule {
+  learningItemId String       @id @db.NVarChar(36)
+  nextReviewAt   DateTime     @db.DateTime2
+  intervalDays   Int          @default(1)
+  repetitions    Int          @default(0)
+  suspended      Boolean      @default(false)
+  updatedAt      DateTime     @updatedAt @db.DateTime2
+  learningItem   LearningItem @relation(fields: [learningItemId], references: [id], onDelete: Cascade)
+
+  @@index([suspended, nextReviewAt])
+}
+
+model ReviewEvent {
+  id             String       @id @default(uuid()) @db.NVarChar(36)
+  learningItemId String       @db.NVarChar(36)
+  reviewedAt     DateTime     @default(now()) @db.DateTime2
+  rating         String       @db.NVarChar(10)
+  responseText   String?      @db.NVarChar(Max)
+  previousStatus String       @db.NVarChar(30)
+  newStatus      String       @db.NVarChar(30)
+  nextReviewAt   DateTime     @db.DateTime2
+  intervalDays   Int
+  notes          String?      @db.NVarChar(Max)
+  learningItem   LearningItem @relation(fields: [learningItemId], references: [id], onDelete: NoAction)
+
+  @@index([learningItemId, reviewedAt])
+}
+
+model UsageEvent {
+  id             String       @id @default(uuid()) @db.NVarChar(36)
+  learningItemId String       @db.NVarChar(36)
+  sourceId       String?      @db.NVarChar(36)
+  usedAt         DateTime     @default(now()) @db.DateTime2
+  scenario       String?      @db.NVarChar(200)
+  outcome        String       @default("used") @db.NVarChar(30)
+  notes          String?      @db.NVarChar(Max)
+  learningItem   LearningItem @relation(fields: [learningItemId], references: [id], onDelete: NoAction)
+  source         Source?      @relation(fields: [sourceId], references: [id], onDelete: NoAction)
+
+  @@index([learningItemId, usedAt])
+}
+
+model InteractionLog {
+  id             String   @id @default(uuid()) @db.NVarChar(36)
+  sourceId       String   @db.NVarChar(36)
+  eventTitle     String   @db.NVarChar(500)
+  eventDate      DateTime? @db.DateTime2
+  scenario       String?  @db.NVarChar(200)
+  whatHappened   String?  @db.NVarChar(Max)
+  whatTheySaid   String?  @db.NVarChar(Max)
+  whatISaid      String?  @db.NVarChar(Max)
+  whatIIntended  String?  @db.NVarChar(Max)
+  whatWentWrong  String?  @db.NVarChar(Max)
+  betterVersion  String?  @db.NVarChar(Max)
+  followUp       String?  @db.NVarChar(Max)
+  reflection     String?  @db.NVarChar(Max)
+  createdAt      DateTime @default(now()) @db.DateTime2
+  updatedAt      DateTime @updatedAt @db.DateTime2
+  source         Source   @relation(fields: [sourceId], references: [id], onDelete: NoAction)
+
+  @@index([sourceId, eventDate])
+}
