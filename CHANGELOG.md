@@ -10,6 +10,11 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 Every material code, schema, configuration, or documentation change must add an
 entry here before it is committed and pushed.
 
+### Changed
+
+- Updated GitHub Actions to Node 24-compatible major versions to remove runner
+  deprecation warnings.
+
 ## [0.1.0] - 2026-07-26
 
 ### Added
