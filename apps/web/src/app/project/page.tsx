@@ -2,8 +2,101 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "项目说明 · Personal English Bank",
-  description: "Personal English Bank 的目标工作流、功能范围和技术架构。",
+  description:
+    "为什么从现实生活构建个人英语语料库，以及 Personal English Bank 的内容、复盘方式和技术架构。",
 };
+
+const whyProblems = [
+  {
+    title: "临场表达困难",
+    body: "脑中知道中文意思，也见过相应英文，但真实对话没有时间慢慢组织语法，最后还是说不出口。",
+  },
+  {
+    title: "交流之后没有复盘",
+    body: "当时没听懂、表达不自然或回答偏题，如果事后不整理，下一次往往还会在同一个地方卡住。",
+  },
+  {
+    title: "大量输入没有变成输出",
+    body: "课堂、本地人和真实对话带来很多英语输入，但听过不等于会用，需要转化为自己能够主动说出的表达。",
+  },
+  {
+    title: "材料增加却无法复习",
+    body: "录音、转写和笔记越来越多，如果没有来源、状态和复习计划，它们只会成为无法再次利用的档案。",
+  },
+];
+
+const lifeLoop = [
+  ["01", "真实经历", "生活、课堂、项目与交流"],
+  ["02", "记录现场", "录音、转写或快速记下缺口"],
+  ["03", "整理语料", "保留上下文并生成双语版本"],
+  ["04", "自我 Review", "发现没听懂、不会说和不自然之处"],
+  ["05", "刻意练习", "把高价值表达加入每日复习"],
+  ["06", "再次使用", "带回真实生活并继续修正"],
+];
+
+const corpusSources = [
+  {
+    title: "My Spoken Output",
+    subtitle: "自己的真实英语输出",
+    body: "真实对话、项目会议、课堂互动、电话、面试和口语练习。重点不是挑错，而是发现重复问题、意思偏差和更容易说出的版本。",
+  },
+  {
+    title: "Australian Native Input",
+    subtitle: "澳洲老师与本地人输入",
+    body: "提取高频口语块、礼貌表达、话题转换和文化语用，并区分可以主动使用、只需听懂和仅适合特定场景的表达。",
+  },
+  {
+    title: "Prepared Self-Expression",
+    subtitle: "主动准备的个人表达",
+    body: "把个人经历、项目、兴趣、观点和未来目标准备成不同长度、正式程度和听众版本，逐渐形成稳定的英文个人叙事。",
+  },
+  {
+    title: "Vocabulary & Patterns",
+    subtitle: "词汇、搭配、句型与发音",
+    body: "不只保存中文释义，还保留真实上下文、常用搭配、自己的例句、使用模式和下一次复习时间。",
+  },
+];
+
+const corpusDomains = [
+  [
+    "Conversation Survival",
+    "对话生存",
+    "请求重复、确认理解、争取思考时间和修复对话",
+  ],
+  ["Australian English", "澳洲英语", "当地表达、缩写、语气、发音和文化语用"],
+  ["Daily Life", "日常生活", "购物、银行、租房、交通、维修、电话和服务场景"],
+  ["University", "学校生活", "课堂、Tutorial、小组作业、老师和学校服务"],
+  [
+    "Clubs & Volunteering",
+    "社团与志愿者",
+    "询问活动、介绍技能、排班和加入团队",
+  ],
+  [
+    "Career & Networking",
+    "职业与人脉",
+    "实习、项目合作、LinkedIn、面试和职业交流",
+  ],
+  ["Personal Narrative", "个人叙事", "个人经历、技能、项目、兴趣、优势和目标"],
+  [
+    "Ideas & Interests",
+    "思想与兴趣",
+    "AI、游戏、书籍、电影、社会议题和个人观点",
+  ],
+  [
+    "Difficult Situations",
+    "困难与紧急场景",
+    "医疗、诈骗、银行卡异常、迷路和物品遗失",
+  ],
+];
+
+const reviewQuestions = [
+  "哪句话当时没有听懂？",
+  "哪个意思知道，却不知道怎样用英语说？",
+  "哪段回答太长、偏题或没有重点？",
+  "对方用了什么值得保留的自然表达？",
+  "我原本想表达什么，实际又说成了什么？",
+  "下一次遇到同样场景，我希望怎样开口和追问？",
+];
 
 const requirements = [
   {
@@ -94,15 +187,126 @@ const flow = [
 export default function ProjectPage() {
   return (
     <div lang="zh-CN">
-      <section className="page-heading project-heading">
-        <div>
-          <p className="eyebrow">Product brief · Architecture</p>
-          <h1>项目说明</h1>
-          <p>
-            这里集中说明你希望加入的内容、第一阶段的真实工作流，以及系统为什么采用当前技术方案。
+      <section className="project-story">
+        <div className="project-story-copy">
+          <div className="story-topline">
+            <p className="eyebrow">Why I am building this</p>
+            <span className="phase-badge">Phase 1 · Local Product Core</span>
+          </div>
+          <h1>把真实生活，变成我能说出口的英语。</h1>
+          <p className="story-lede">
+            我正在学习英语。真正让我进步的材料，不只来自教材，也来自每天发生的课堂、生活、项目和人与人之间的交流。
+          </p>
+          <p className="story-detail">
+            我想记录这些现实经验，回看自己哪里没有听懂、哪里不会表达、哪里说得不够自然；再把真正有价值的部分整理成个人语料库，持续复习、刻意练习，并在下一次真实交流中重新使用。
           </p>
         </div>
-        <span className="phase-badge">Phase 1 · Local Product Core</span>
+        <aside className="story-principle">
+          <span>项目真正衡量的不是</span>
+          <strong>收集了多少内容</strong>
+          <span>而是</span>
+          <strong>下一次交流是否比上一次更自然。</strong>
+        </aside>
+      </section>
+
+      <section className="project-section why-section">
+        <div className="section-intro">
+          <p className="eyebrow">The reason</p>
+          <h2>为什么要做 Personal English Bank</h2>
+          <p>
+            它不是普通单词本，也不是录音仓库。它要解决的是英语学习进入真实生活之后，反复出现却一直没有形成闭环的问题。
+          </p>
+        </div>
+        <div className="why-grid">
+          {whyProblems.map((problem, index) => (
+            <article className="why-card" key={problem.title}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <h3>{problem.title}</h3>
+              <p>{problem.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="project-section">
+        <div className="section-intro">
+          <p className="eyebrow">The learning loop</p>
+          <h2>从现实生活积累，再回到现实生活</h2>
+          <p>
+            每一次真实交流都是新的学习材料；每一次复盘和练习，都应该让下一次交流更容易继续下去。
+          </p>
+        </div>
+        <ol className="life-loop">
+          {lifeLoop.map(([number, title, description]) => (
+            <li key={number}>
+              <span>{number}</span>
+              <strong>{title}</strong>
+              <small>{description}</small>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="project-section review-story">
+        <article className="review-copy">
+          <p className="eyebrow">Self review</p>
+          <h2>交流结束后，我会重新问自己</h2>
+          <p>
+            自我 Review
+            不是给自己打分，而是把一次已经结束的经历，转换成下一次能够直接调用的英语。
+          </p>
+          <div className="review-output">
+            <span>最终沉淀为</span>
+            <strong>Personal Narrative · 关于“我是谁”的稳定表达</strong>
+            <strong>Conversation Toolkit · 提问、追问、补救与结束表达</strong>
+          </div>
+        </article>
+        <ul className="review-questions">
+          {reviewQuestions.map((question) => (
+            <li key={question}>{question}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="project-section">
+        <div className="section-intro">
+          <p className="eyebrow">Corpus sources</p>
+          <h2>个人语料库从哪里积累</h2>
+          <p>
+            系统同时吸收自己的输出、真实环境中的英语输入、主动准备的表达，以及需要长期掌握的词汇和句型。
+          </p>
+        </div>
+        <div className="corpus-source-grid">
+          {corpusSources.map((source) => (
+            <article className="corpus-source-card" key={source.title}>
+              <span>{source.title}</span>
+              <h3>{source.subtitle}</h3>
+              <p>{source.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="project-section">
+        <div className="section-intro">
+          <p className="eyebrow">What is inside</p>
+          <h2>语料库包含这些内容</h2>
+          <p>
+            内容围绕近期真实会遇到、真正需要听懂或主动表达的场景组织，而不是为了数量收集整篇教材和复杂句子。
+          </p>
+        </div>
+        <div className="corpus-domain-grid">
+          {corpusDomains.map(([english, chinese, description], index) => (
+            <article className="corpus-domain-card" key={english}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <div>
+                <small>{english}</small>
+                <h3>{chinese}</h3>
+                <p>{description}</p>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="project-boundary" aria-label="Phase 1 boundary">
@@ -122,10 +326,10 @@ export default function ProjectPage() {
 
       <section className="project-section">
         <div className="section-intro">
-          <p className="eyebrow">What you want to add</p>
-          <h2>我要加入的内容</h2>
+          <p className="eyebrow">Product capabilities</p>
+          <h2>系统如何承接这些内容</h2>
           <p>
-            目标不是简单保存转写，而是把真实交流整理成可追溯、可搜索、能够每天练习的个人英语语料库。
+            现实经验只有经过保真保存、双语整理、筛选和复习，才能真正变成可复用的个人英语。
           </p>
         </div>
         <div className="requirements-grid">

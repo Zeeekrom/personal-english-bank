@@ -27,8 +27,9 @@ entry here before it is committed and pushed.
 
 ### Added
 
-- Added a dedicated Project page that explains the requested corpus workflow,
-  current Phase 1 scope, technology stack, data model and extension boundaries.
+- Added a dedicated Project page that explains why the personal corpus exists,
+  the real-life learning and self-review loop, four corpus sources, nine content
+  domains, current Phase 1 scope, technology stack and extension boundaries.
 - Complete source-file storage and untruncated previews for original, raw
   bilingual and refined bilingual text.
 - Corpus audit and post-import verification scripts that prove source-text
