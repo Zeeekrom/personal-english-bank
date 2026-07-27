@@ -43,6 +43,12 @@ entry here before it is committed and pushed.
   items.
 - Cascade-safe source deletion and a curated-workflow smoke test.
 
+### Fixed
+
+- Suppressed root-element hydration warnings caused by browser translation
+  extensions changing the document language and adding translation classes
+  before React hydrates.
+
 ## [0.1.0] - 2026-07-26
 
 ### Added
