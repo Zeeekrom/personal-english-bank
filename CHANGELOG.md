@@ -27,6 +27,8 @@ entry here before it is committed and pushed.
 
 ### Added
 
+- Added a dedicated Project page that explains the requested corpus workflow,
+  current Phase 1 scope, technology stack, data model and extension boundaries.
 - Complete source-file storage and untruncated previews for original, raw
   bilingual and refined bilingual text.
 - Corpus audit and post-import verification scripts that prove source-text

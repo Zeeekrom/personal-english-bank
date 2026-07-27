@@ -5,6 +5,7 @@ const links = [
   { href: "/sources", label: "Sources" },
   { href: "/learning", label: "Learning bank" },
   { href: "/review", label: "Review" },
+  { href: "/project", label: "Project" },
 ];
 
 export function Navigation() {

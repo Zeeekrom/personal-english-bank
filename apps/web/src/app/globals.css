@@ -270,6 +270,206 @@ h2 {
   background: var(--blue);
 }
 
+.project-heading {
+  gap: 28px;
+}
+
+.project-heading > div {
+  max-width: 780px;
+}
+
+.phase-badge {
+  background: var(--forest);
+  border-radius: 999px;
+  color: var(--lime);
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 10px 14px;
+}
+
+.project-boundary {
+  background: var(--forest);
+  border-radius: 20px;
+  color: white;
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 72px;
+  overflow: hidden;
+}
+
+.project-boundary div {
+  background: rgba(255, 255, 255, 0.04);
+  padding: 24px;
+}
+
+.project-boundary span,
+.project-boundary strong {
+  display: block;
+}
+
+.project-boundary span {
+  color: var(--lime);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.project-boundary strong {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.project-section {
+  margin-top: 72px;
+}
+
+.section-intro {
+  max-width: 720px;
+}
+
+.section-intro h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(34px, 4vw, 52px);
+  font-weight: 500;
+  line-height: 1.02;
+  margin-bottom: 18px;
+}
+
+.section-intro > p:last-child {
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.requirements-grid,
+.technology-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 30px;
+}
+
+.requirement-card,
+.technology-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 26px;
+}
+
+.requirement-meta {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 34px;
+}
+
+.requirement-meta > span {
+  color: var(--orange);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px;
+}
+
+.requirement-meta small,
+.technology-card > span {
+  background: #edf1ec;
+  border-radius: 999px;
+  color: var(--forest);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 7px 9px;
+  text-transform: uppercase;
+}
+
+.requirement-card h3,
+.technology-card h3 {
+  font-size: 20px;
+  margin: 0 0 12px;
+}
+
+.requirement-card p,
+.technology-card p {
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+.architecture-flow {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(5, 1fr);
+  list-style: none;
+  margin: 30px 0 0;
+  padding: 0;
+}
+
+.architecture-flow li {
+  background: var(--forest);
+  border-radius: 16px;
+  color: white;
+  min-height: 170px;
+  padding: 22px;
+  position: relative;
+}
+
+.architecture-flow li:not(:last-child)::after {
+  color: var(--orange);
+  content: "→";
+  font-size: 20px;
+  font-weight: 900;
+  position: absolute;
+  right: -18px;
+  top: 72px;
+  z-index: 1;
+}
+
+.architecture-flow > li > span {
+  color: var(--lime);
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px;
+  margin-bottom: 26px;
+}
+
+.architecture-flow strong,
+.architecture-flow small {
+  display: block;
+}
+
+.architecture-flow small {
+  color: #c8d7d1;
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+.technology-card > span {
+  display: inline-block;
+  margin-bottom: 26px;
+}
+
+.project-list {
+  color: var(--muted);
+  display: grid;
+  gap: 14px;
+  line-height: 1.6;
+  margin: 22px 0 0;
+  padding-left: 20px;
+}
+
+.project-list strong {
+  color: var(--ink);
+}
+
+.project-safety {
+  background: var(--blue);
+}
+
 .page-heading {
   align-items: end;
   display: flex;
@@ -766,8 +966,26 @@ summary {
 
   .import-panel,
   .transcript-layout,
-  .interaction-section {
+  .interaction-section,
+  .requirements-grid,
+  .technology-grid {
     grid-template-columns: 1fr;
+  }
+
+  .architecture-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .architecture-flow li {
+    min-height: 0;
+  }
+
+  .architecture-flow li:not(:last-child)::after {
+    bottom: -20px;
+    left: 50%;
+    right: auto;
+    top: auto;
+    transform: rotate(90deg);
   }
 
   .editor-panel {
@@ -803,5 +1021,14 @@ summary {
 
   .page-heading {
     gap: 20px;
+  }
+
+  .project-boundary {
+    grid-template-columns: 1fr;
+    margin-bottom: 52px;
+  }
+
+  .project-section {
+    margin-top: 52px;
   }
 }
