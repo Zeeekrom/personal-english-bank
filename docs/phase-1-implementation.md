@@ -25,8 +25,9 @@ One curated package creates all records in one SQL transaction:
 Source
 ├── SourceAsset (package and original-file reference)
 ├── Transcript
-│   ├── originalText = raw bilingual evidence
-│   ├── cleanedText  = refined bilingual version
+│   ├── sourceText   = complete extracted source file
+│   ├── originalText = complete raw bilingual evidence
+│   ├── cleanedText  = complete refined bilingual version
 │   └── TranscriptSegment[] = kept sentence pairs
 └── LearningItem[]
     ├── raw English / Chinese evidence
@@ -39,6 +40,14 @@ Source
 The Zod runtime schema and the published JSON Schema both use contract version
 `1.0`. Import is idempotent by a SHA-256 hash of the evidence and curated
 sentences.
+
+The source detail API and page return and render all three transcript fields
+without excerpts, line clamps or pagination. Only `TranscriptSegment[]` is
+filtered to the sentences selected for review.
+
+Folder imports accept at most 20 packages per API transaction request. The
+repository import script discovers every waiting package and submits as many
+20-package batches as necessary.
 
 ## CRUD
 

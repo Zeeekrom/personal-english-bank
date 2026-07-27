@@ -72,6 +72,7 @@ export const curatedImportSchema = z.object({
     language: z.string().trim().min(1).max(30).default("en-zh"),
   }),
   evidence: z.object({
+    sourceText: z.string().min(1),
     rawBilingualText: z.string().trim().min(1),
     refinedBilingualText: z.string().trim().min(1),
     transcriptionTool: z.string().trim().max(100).optional(),

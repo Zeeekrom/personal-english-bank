@@ -89,7 +89,7 @@ Open:
 - Web: `http://localhost:3000`
 - API: `http://localhost:3001/api/dashboard`
 
-Import up to five waiting curated packages:
+Import every waiting curated package in safe batches of 20:
 
 ```powershell
 pnpm db:seed

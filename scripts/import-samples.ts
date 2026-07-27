@@ -12,23 +12,44 @@ async function main(): Promise<void> {
   const discovered = (await discoveredResponse.json()) as Array<{
     relativePath: string;
   }>;
-  const relativePaths = discovered.slice(0, 5).map((item) => item.relativePath);
+  const relativePaths = discovered.map((item) => item.relativePath);
   if (relativePaths.length === 0) {
     process.stdout.write("No *.curated.json package is ready for import.\n");
     return;
   }
 
-  const response = await fetch(`${apiUrl}/api/imports`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ relativePaths }),
-  });
-  if (!response.ok) {
-    throw new Error(
-      `Curated import failed: ${response.status} ${await response.text()}`,
-    );
+  const results: Array<{
+    status: "imported" | "duplicate" | "skipped";
+    relativePath: string;
+    segments?: number;
+    reason?: string;
+  }> = [];
+  for (let index = 0; index < relativePaths.length; index += 20) {
+    const batch = relativePaths.slice(index, index + 20);
+    const response = await fetch(`${apiUrl}/api/imports`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ relativePaths: batch }),
+    });
+    if (!response.ok) {
+      throw new Error(
+        `Curated import failed: ${response.status} ${await response.text()}`,
+      );
+    }
+    results.push(...((await response.json()) as typeof results));
   }
-  process.stdout.write(`${JSON.stringify(await response.json(), null, 2)}\n`);
+
+  const counts = results.reduce(
+    (total, item) => {
+      total[item.status] += 1;
+      total.sentences += item.segments ?? 0;
+      return total;
+    },
+    { imported: 0, duplicate: 0, skipped: 0, sentences: 0 },
+  );
+  process.stdout.write(
+    `${JSON.stringify({ discovered: relativePaths.length, ...counts, results }, null, 2)}\n`,
+  );
 }
 
 void main();

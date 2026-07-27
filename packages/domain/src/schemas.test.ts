@@ -10,6 +10,7 @@ const validPackage = {
     summaryCn: "咨询银行卡邮寄进度。",
   },
   evidence: {
+    sourceText: "Where my card?",
     rawBilingualText: "Where my card?\n我的卡在哪里？",
     refinedBilingualText:
       "Could you tell me when my card will arrive?\n请问我的银行卡什么时候能寄到？",
@@ -41,6 +42,13 @@ describe("curatedImportSchema", () => {
   it("rejects a package without refined sentences", () => {
     expect(
       curatedImportSchema.safeParse({ ...validPackage, sentences: [] }).success,
+    ).toBe(false);
+  });
+
+  it("rejects a package without the complete source text", () => {
+    const { sourceText: _sourceText, ...evidence } = validPackage.evidence;
+    expect(
+      curatedImportSchema.safeParse({ ...validPackage, evidence }).success,
     ).toBe(false);
   });
 });

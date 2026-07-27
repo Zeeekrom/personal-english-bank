@@ -11,6 +11,7 @@
     "language": "en-zh"
   },
   "evidence": {
+    "sourceText": "Where my card arrive?",
     "rawBilingualText": "Where my card arrive?\n我的卡什么时候到？",
     "refinedBilingualText": "Could you tell me when my card will arrive?\n请问我的银行卡什么时候能寄到？",
     "transcriptionTool": "local-whisper",

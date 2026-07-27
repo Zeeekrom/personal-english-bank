@@ -33,8 +33,9 @@
     "evidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["rawBilingualText", "refinedBilingualText"],
+      "required": ["sourceText", "rawBilingualText", "refinedBilingualText"],
       "properties": {
+        "sourceText": { "type": "string", "minLength": 1 },
         "rawBilingualText": { "type": "string", "minLength": 1 },
         "refinedBilingualText": { "type": "string", "minLength": 1 },
         "transcriptionTool": { "type": "string", "maxLength": 100 },

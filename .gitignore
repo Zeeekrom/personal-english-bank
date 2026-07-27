@@ -10,3 +10,4 @@ coverage/
 packages/database/src/generated/
 .playwright-cli/
 output/playwright/
+local-reports/

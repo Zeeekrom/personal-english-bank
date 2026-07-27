@@ -124,7 +124,7 @@ export default function SourcesPage() {
               <input
                 checked={selected.includes(file.relativePath)}
                 disabled={
-                  !selected.includes(file.relativePath) && selected.length >= 5
+                  !selected.includes(file.relativePath) && selected.length >= 20
                 }
                 onChange={(event) =>
                   setSelected((current) =>
@@ -153,7 +153,7 @@ export default function SourcesPage() {
           onClick={importSelected}
           type="button"
         >
-          {busy ? "Importing…" : `Import selected (${selected.length}/5)`}
+          {busy ? "Importing…" : `Import selected (${selected.length}/20)`}
         </button>
         {message ? <p className="notice">{message}</p> : null}
       </section>

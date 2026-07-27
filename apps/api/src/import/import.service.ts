@@ -48,6 +48,7 @@ function contentHash(input: CuratedImportInput): string {
       JSON.stringify({
         contractVersion: input.contractVersion,
         originalFileName: input.source.originalFileName,
+        sourceText: input.evidence.sourceText,
         rawBilingualText: input.evidence.rawBilingualText,
         refinedBilingualText: input.evidence.refinedBilingualText,
         sentences: input.sentences,
@@ -197,6 +198,7 @@ export class ImportService {
           provider: "codex_manual",
           format: "curated_bilingual_v1",
           language: input.source.language,
+          sourceText: input.evidence.sourceText,
           originalText: input.evidence.rawBilingualText,
           cleanedText: input.evidence.refinedBilingualText,
         },

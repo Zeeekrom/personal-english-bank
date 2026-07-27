@@ -43,6 +43,7 @@ async function main(): Promise<void> {
             summaryCn: "验证精修语料导入、查询、修改、复习和删除。",
           },
           evidence: {
+            sourceText: "Where my card arrive?",
             rawBilingualText: "Where my card arrive?\n我的卡什么时候到？",
             refinedBilingualText:
               "Could you tell me when my card will arrive?\n请问我的银行卡什么时候能寄到？",
@@ -65,8 +66,23 @@ async function main(): Promise<void> {
 
     const source = await request<{
       summaryCn: string;
+      transcripts: Array<{
+        sourceText?: string;
+        originalText: string;
+        cleanedText?: string;
+      }>;
       learningLinks: Array<{ learningItem: { id: string } }>;
     }>(`/sources/${sourceId}`);
+    const transcript = source.transcripts[0];
+    if (
+      transcript?.sourceText !== "Where my card arrive?" ||
+      !transcript.originalText.includes("我的卡什么时候到") ||
+      !transcript.cleanedText?.includes("Could you tell me")
+    ) {
+      throw new Error(
+        "Complete source and bilingual previews were not stored.",
+      );
+    }
     const itemId = source.learningLinks[0]?.learningItem.id;
     if (!itemId)
       throw new Error("Curated sentence was not linked to its source.");

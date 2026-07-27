@@ -12,6 +12,10 @@ entry here before it is committed and pushed.
 
 ### Changed
 
+- Expanded the curated-folder importer from five sample packages to all waiting
+  packages, submitted in bounded batches of 20.
+- Updated the product authority and Phase 1 documentation to separate completed
+  packages from the external GPT/Curator backlog.
 - Updated GitHub Actions to Node 24-compatible major versions to remove runner
   deprecation warnings.
 - Replaced raw transcript import and user-side manual selection with a
@@ -23,6 +27,12 @@ entry here before it is committed and pushed.
 
 ### Added
 
+- Complete source-file storage and untruncated previews for original, raw
+  bilingual and refined bilingual text.
+- Corpus audit and post-import verification scripts that prove source-text
+  equality, bilingual completeness and imported sentence counts without
+  publishing personal corpus content.
+- DOCX text extraction support for external corpus auditing and curation.
 - Versioned `1.0` curated import API, JSON Schema and example package.
 - Raw and refined bilingual evidence, source summaries, sentence-level
   curation fields and source/date traceability.

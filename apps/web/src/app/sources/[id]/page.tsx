@@ -31,6 +31,7 @@ interface SourceDetail {
     id: string;
     provider: string;
     format: string;
+    sourceText?: string;
     originalText: string;
     cleanedText?: string;
     segments: Segment[];
@@ -208,22 +209,58 @@ export default function SourceDetailPage() {
         </section>
 
         <aside className="editor-panel">
-          <p className="eyebrow">Evidence archive</p>
-          <h2>Raw and refined bilingual versions</h2>
-          <details>
-            <summary>Raw bilingual evidence</summary>
-            <pre>{transcript?.originalText}</pre>
-          </details>
-          <details open>
-            <summary>Refined bilingual version</summary>
-            <pre>{transcript?.cleanedText}</pre>
-          </details>
+          <p className="eyebrow">Preview guarantee</p>
+          <h2>The complete file is available below</h2>
           <p>
-            Sentence edits and deletion are available in the Learning bank.
-            Every item remains linked to this file and sentence index.
+            No line limit, excerpt, pagination or API truncation is applied.
+            Long content remains scrollable in the browser, and every character
+            returned by the source file is present.
           </p>
+          <dl className="content-stats">
+            <div>
+              <dt>Original file</dt>
+              <dd>{transcript?.sourceText?.length ?? 0} characters</dd>
+            </div>
+            <div>
+              <dt>Raw bilingual</dt>
+              <dd>{transcript?.originalText.length ?? 0} characters</dd>
+            </div>
+            <div>
+              <dt>Refined bilingual</dt>
+              <dd>{transcript?.cleanedText?.length ?? 0} characters</dd>
+            </div>
+          </dl>
         </aside>
       </div>
+
+      <section className="panel full-document-preview">
+        <div className="panel-heading">
+          <div>
+            <p className="eyebrow">Full-file preview</p>
+            <h2>Complete source and bilingual versions</h2>
+          </div>
+        </div>
+        <details open>
+          <summary>
+            Original file · {transcript?.sourceText?.length ?? 0} characters
+          </summary>
+          <pre className="full-document-text">{transcript?.sourceText}</pre>
+        </details>
+        <details>
+          <summary>
+            Raw bilingual evidence · {transcript?.originalText.length ?? 0}{" "}
+            characters
+          </summary>
+          <pre className="full-document-text">{transcript?.originalText}</pre>
+        </details>
+        <details>
+          <summary>
+            Refined bilingual version · {transcript?.cleanedText?.length ?? 0}{" "}
+            characters
+          </summary>
+          <pre className="full-document-text">{transcript?.cleanedText}</pre>
+        </details>
+      </section>
     </>
   );
 }

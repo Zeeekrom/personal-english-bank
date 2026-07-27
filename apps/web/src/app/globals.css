@@ -20,7 +20,12 @@ html {
   background: var(--paper);
   color: var(--ink);
   font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
     sans-serif;
 }
 
@@ -135,7 +140,11 @@ h2 {
 .hero {
   align-items: end;
   background:
-    radial-gradient(circle at 87% 14%, rgba(216, 237, 157, 0.85), transparent 24%),
+    radial-gradient(
+      circle at 87% 14%,
+      rgba(216, 237, 157, 0.85),
+      transparent 24%
+    ),
     var(--forest);
   border-radius: 28px;
   color: white;
@@ -497,6 +506,56 @@ select:focus {
 .editor-panel {
   position: sticky;
   top: 100px;
+}
+
+.content-stats {
+  display: grid;
+  gap: 10px;
+  margin: 22px 0 0;
+}
+
+.content-stats div {
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  padding-top: 10px;
+}
+
+.content-stats dt {
+  color: var(--muted);
+}
+
+.content-stats dd {
+  font-weight: 700;
+  margin: 0;
+}
+
+.full-document-preview {
+  margin-top: 24px;
+  padding-bottom: 8px;
+}
+
+.full-document-preview > details {
+  border-bottom: 1px solid var(--line);
+  margin: 0;
+  padding: 18px 24px;
+}
+
+.full-document-text {
+  background: #f8faf7;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.75;
+  margin: 16px 0 0;
+  max-height: none;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  padding: 20px;
+  tab-size: 2;
+  white-space: pre-wrap;
+  width: 100%;
 }
 
 .editor-panel form,

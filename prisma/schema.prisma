@@ -54,6 +54,7 @@ model Transcript {
   provider     String              @default("import") @db.NVarChar(50)
   format       String              @default("plain") @db.NVarChar(30)
   language     String              @default("unknown") @db.NVarChar(30)
+  sourceText   String?             @db.NVarChar(Max)
   originalText String              @db.NVarChar(Max)
   cleanedText  String?             @db.NVarChar(Max)
   version      Int                 @default(1)
