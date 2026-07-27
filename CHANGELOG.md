@@ -12,6 +12,10 @@ entry here before it is committed and pushed.
 
 ### Changed
 
+- Raised the bounded JSON request limit to 10 MB so complete long-form source,
+  raw bilingual and refined bilingual evidence can use the direct import API.
+- Added optional curator provenance (`codex`, `gpt`, `manual` or `other`) to the
+  compatible `1.0` Curated Import Contract.
 - Expanded the curated-folder importer from five sample packages to all waiting
   packages, submitted in bounded batches of 20.
 - Updated the product authority and Phase 1 documentation to separate completed
@@ -27,6 +31,14 @@ entry here before it is committed and pushed.
 
 ### Added
 
+- Added a dedicated Import page for UTF-8 JSON upload or paste, browser-side
+  package recognition, full-content statistics, API validation and direct
+  navigation to the imported source.
+- Added a reusable, copyable GPT curation prompt and documented supported input
+  types, filename recognition, validation, SHA-256 deduplication and
+  transactional writes.
+- Added browser-recognition tests and a greater-than-100-KB direct-import smoke
+  case.
 - Added a dedicated Project page that explains why the personal corpus exists,
   the real-life learning and self-review loop, four corpus sources, nine content
   domains, current Phase 1 scope, technology stack and extension boundaries.

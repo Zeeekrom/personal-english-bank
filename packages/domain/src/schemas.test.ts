@@ -28,7 +28,16 @@ const validPackage = {
 
 describe("curatedImportSchema", () => {
   it("accepts a complete curated bilingual package", () => {
-    expect(curatedImportSchema.safeParse(validPackage).success).toBe(true);
+    const parsed = curatedImportSchema.parse(validPackage);
+    expect(parsed.source.curatedBy).toBe("codex");
+  });
+
+  it("records GPT as the external curator when supplied", () => {
+    const parsed = curatedImportSchema.parse({
+      ...validPackage,
+      source: { ...validPackage.source, curatedBy: "gpt" },
+    });
+    expect(parsed.source.curatedBy).toBe("gpt");
   });
 
   it("rejects a package without a source summary", () => {

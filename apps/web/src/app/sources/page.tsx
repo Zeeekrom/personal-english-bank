@@ -117,6 +117,9 @@ export default function SourcesPage() {
             refined by Codex. This inbox accepts only{" "}
             <code>*.curated.json</code>.
           </p>
+          <Link className="text-link" href="/import">
+            Upload or paste GPT JSON
+          </Link>
         </div>
         <div className="import-list">
           {available.slice(0, 20).map((file) => (

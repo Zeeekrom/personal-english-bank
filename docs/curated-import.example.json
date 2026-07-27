@@ -8,7 +8,8 @@
     "capturedAt": "2026-07-26T02:00:00.000Z",
     "scenario": "bank",
     "summaryCn": "询问银行卡邮寄时间并确认地址。",
-    "language": "en-zh"
+    "language": "en-zh",
+    "curatedBy": "codex"
   },
   "evidence": {
     "sourceText": "Where my card arrive?",

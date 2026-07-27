@@ -70,6 +70,7 @@ export const curatedImportSchema = z.object({
     scenario: z.string().trim().max(100).optional(),
     summaryCn: z.string().trim().min(1).max(4000),
     language: z.string().trim().min(1).max(30).default("en-zh"),
+    curatedBy: z.enum(["codex", "gpt", "manual", "other"]).default("codex"),
   }),
   evidence: z.object({
     sourceText: z.string().min(1),

@@ -27,7 +27,11 @@
         "capturedAt": { "type": "string", "format": "date-time" },
         "scenario": { "type": "string", "maxLength": 100 },
         "summaryCn": { "type": "string", "minLength": 1, "maxLength": 4000 },
-        "language": { "type": "string", "default": "en-zh", "maxLength": 30 }
+        "language": { "type": "string", "default": "en-zh", "maxLength": 30 },
+        "curatedBy": {
+          "enum": ["codex", "gpt", "manual", "other"],
+          "default": "codex"
+        }
       }
     },
     "evidence": {

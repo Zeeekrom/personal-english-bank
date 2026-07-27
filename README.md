@@ -42,9 +42,12 @@ The contract is defined in
 [`docs/curated-import.schema.json`](docs/curated-import.schema.json), with a
 safe example in
 [`docs/curated-import.example.json`](docs/curated-import.example.json).
+The reusable GPT instructions are in
+[`docs/gpt-curated-import-prompt.md`](docs/gpt-curated-import-prompt.md).
 
 Curated packages can be imported from the configured `TRANSLATION_ROOT` as
-`*.curated.json`, or posted directly:
+`*.curated.json`, uploaded/pasted on `http://localhost:3000/import`, or posted
+directly:
 
 ```http
 POST /api/imports/curated
@@ -87,6 +90,7 @@ pnpm dev
 Open:
 
 - Web: `http://localhost:3000`
+- GPT JSON import: `http://localhost:3000/import`
 - API: `http://localhost:3001/api/dashboard`
 
 Import every waiting curated package in safe batches of 20:

@@ -2,6 +2,9 @@ import { prisma } from "@peb/database";
 
 const apiUrl = process.env.API_URL ?? "http://localhost:3001";
 const title = "[smoke-test] Curated workflow";
+const largeSourceText = `Where my card arrive?\n${"Complete source context. ".repeat(
+  7_000,
+)}`;
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${apiUrl}/api${path}`, {
@@ -43,7 +46,7 @@ async function main(): Promise<void> {
             summaryCn: "验证精修语料导入、查询、修改、复习和删除。",
           },
           evidence: {
-            sourceText: "Where my card arrive?",
+            sourceText: largeSourceText,
             rawBilingualText: "Where my card arrive?\n我的卡什么时候到？",
             refinedBilingualText:
               "Could you tell me when my card will arrive?\n请问我的银行卡什么时候能寄到？",
@@ -75,7 +78,7 @@ async function main(): Promise<void> {
     }>(`/sources/${sourceId}`);
     const transcript = source.transcripts[0];
     if (
-      transcript?.sourceText !== "Where my card arrive?" ||
+      transcript?.sourceText !== largeSourceText ||
       !transcript.originalText.includes("我的卡什么时候到") ||
       !transcript.cleanedText?.includes("Could you tell me")
     ) {

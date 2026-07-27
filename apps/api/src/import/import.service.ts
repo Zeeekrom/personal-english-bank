@@ -167,7 +167,7 @@ export class ImportService {
           language: input.source.language,
           scenario: input.source.scenario,
           summaryCn: input.source.summaryCn,
-          curatedBy: "codex_manual",
+          curatedBy: input.source.curatedBy,
           capturedAt: input.source.capturedAt,
           processingStatus: "processed",
         },
@@ -195,7 +195,7 @@ export class ImportService {
       const transcript = await tx.transcript.create({
         data: {
           sourceId: createdSource.id,
-          provider: "codex_manual",
+          provider: input.evidence.transcriptionTool ?? input.source.curatedBy,
           format: "curated_bilingual_v1",
           language: input.source.language,
           sourceText: input.evidence.sourceText,
